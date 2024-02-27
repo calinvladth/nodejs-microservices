@@ -20,15 +20,17 @@ COPY . .
 CMD npm install
 CMD npm run dev
 
-#FROM base as prod
-#RUN --mount=type=bind,source=package.json,target=package.json \
-#    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-#    --mount=type=cache,target=/root/.npm \
-#    npm ci --omit=dev
-#USER node
-#COPY . .
-#CMD node src/index.js
-#
+FROM base as prod
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev
+COPY . .
+RUN chmod -R 777 /usr/src/app
+RUN npm install
+RUN npm run build
+CMD npm start
+
 #FROM base as test
 #ENV NODE_ENV test
 #RUN --mount=type=bind,source=package.json,target=package.json \

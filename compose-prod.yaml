@@ -1,0 +1,72 @@
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - customer
+      - email
+  customer:
+    build:
+      context: ./customer
+      target: prod
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      JWT_SECRET_FILE: /run/secrets/jwt-secret
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD_FILE: /run/secrets/db-password
+      DB_DATABASE: auth
+#    ports:
+#      - 3001:3001
+    depends_on:
+      db:
+        condition: service_healthy
+    secrets:
+      - db-password
+      - jwt-secret
+    volumes:
+      - ./customer/src:/usr/src/app/src
+  email:
+    build:
+      context: ./email
+      target: prod
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+#    ports:
+#      - 3002:3002
+    volumes:
+      - ./email/src:/usr/src/app/src
+
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=auth
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    expose:
+      - 5432
+    ports:
+      - 5433:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+secrets:
+  db-password:
+    file: secrets/db-password.txt
+  jwt-secret:
+    file: secrets/jwt-secret.txt
