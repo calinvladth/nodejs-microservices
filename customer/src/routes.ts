@@ -1,5 +1,4 @@
 import express from "express";
-import {database} from "./database";
 import {services} from "./services";
 import {middleware} from "./middleware";
 

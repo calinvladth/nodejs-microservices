@@ -1,12 +1,13 @@
 // TODO: Handle db from here
 import {Pool} from 'pg'
 import {models} from "../models";
+import {config} from "../config";
 
 const pool = new Pool({
-    host: '192.168.68.10',
-    user: 'postgres',
-    password: '1q2w3e',
-    database: 'auth',
+    host: config.DB_HOST,
+    user: config.DB_USER,
+    password: config.DB_PASSWORD,
+    database: config.DB_DATABASE,
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,

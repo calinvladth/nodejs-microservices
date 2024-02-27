@@ -8,16 +8,48 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
-  server:
+  customer:
     build:
-      context: ./src
+      context: ./customer
+      target: dev
     environment:
       NODE_ENV: production
+      PORT: 3001
+      JWT_SECRET_FILE: /run/secrets/jwt-secret
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD_FILE: /run/secrets/db-password
+      DB_DATABASE: auth
     ports:
-      - 8001:8001
+      - 3001:3001
     depends_on:
       db:
         condition: service_healthy
+    secrets:
+      - db-password
+      - jwt-secret
+    volumes:
+      - ./customer/src:/usr/src/app/src
+  email:
+    build:
+      context: ./email
+      target: dev
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+    #      POSTGRES_HOST: db
+    #      POSTGRES_USER: postgres
+    #      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    #      POSTGRES_DB: example
+    ports:
+      - 3002:3002
+    #    depends_on:
+    #      db:
+    #        condition: service_healthy
+    #    secrets:
+    #      - db-password
+    volumes:
+      - ./email/src:/usr/src/app/src
 
   db:
     image: postgres
@@ -33,15 +65,17 @@ services:
     expose:
       - 5432
     ports:
-      - 5432:5432
+      - 5433:5432
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 10s
       timeout: 5s
       retries: 5
+
 volumes:
   db-data:
 secrets:
   db-password:
-    file: db/password.txt
-
+    file: secrets/db-password.txt
+  jwt-secret:
+    file: secrets/jwt-secret.txt
