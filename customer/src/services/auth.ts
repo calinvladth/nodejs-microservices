@@ -33,7 +33,7 @@ async function signIn(req: Request, res: Response) {
 }
 
 async function checkProtection(req: Request, res: Response) {
-    res.send({user: res.locals.user, session: ''})
+    res.send({user: res.locals.user})
 }
 
 export const auth = {
