@@ -9,9 +9,7 @@ services:
       - customer
       - email
   customer:
-    build:
-      context: ./customer
-      target: prod
+    image: calinvladth/customer:latest
     environment:
       NODE_ENV: production
       PORT: 3001
@@ -28,19 +26,17 @@ services:
     secrets:
       - db-password
       - jwt-secret
-    volumes:
-      - ./customer/src:/usr/src/app/src
+#    volumes:
+#      - ./customer/src:/usr/src/app/src
   email:
-    build:
-      context: ./email
-      target: prod
+    image: calinvladth/email
     environment:
       NODE_ENV: production
       PORT: 3002
 #    ports:
 #      - 3002:3002
-    volumes:
-      - ./email/src:/usr/src/app/src
+#    volumes:
+#      - ./email/src:/usr/src/app/src
 
   db:
     image: postgres
