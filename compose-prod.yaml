@@ -18,25 +18,17 @@ services:
       DB_USER: postgres
       DB_PASSWORD_FILE: /run/secrets/db-password
       DB_DATABASE: auth
-#    ports:
-#      - 3001:3001
     depends_on:
       db:
         condition: service_healthy
     secrets:
       - db-password
       - jwt-secret
-#    volumes:
-#      - ./customer/src:/usr/src/app/src
   email:
-    image: calinvladth/email
+    image: calinvladth/email:latest
     environment:
       NODE_ENV: production
       PORT: 3002
-#    ports:
-#      - 3002:3002
-#    volumes:
-#      - ./email/src:/usr/src/app/src
 
   db:
     image: postgres

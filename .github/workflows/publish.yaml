@@ -1,0 +1,15 @@
+name: Docker CI for GHCR
+
+on:
+  push
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and publish image
+        run: |
+          docker login --username ${{DOCKER_USERNAME}} --password ${{GHCR_TOKEN}}
+          docker build customer -t ghcr.io/${{DOCKER_USERNAME}}/customer_service:latest
+          docker push ghcr.io/${{DOCKER_USERNAME}}/customer_service:latest
