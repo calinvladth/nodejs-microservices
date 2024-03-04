@@ -1,19 +1,20 @@
-import express from "express";
+import {Express} from "express";
 import {services} from "./services";
 import {middleware} from "./middleware";
 
-const router = express.Router();
 
-router.get('/', async (req, res) => {
-    res.send({
-        message: 'Hola from customer service'
+function routes(app: Express) {
+    app.get('/', async (req, res) => {
+        res.send({
+            message: 'Hola from customer service'
+        });
     });
-});
 
-router.post('/auth/signup', services.auth.signUp)
-router.post('/auth/signin', services.auth.signIn)
+    app.post('/auth/signup', services.auth.signUp)
+    app.post('/auth/signin', services.auth.signIn)
 
-router.get('/protected', [middleware.verifyTokenController], services.auth.checkProtection)
+    app.get('/protected', [middleware.verifyTokenController], services.auth.checkProtection)
+}
 
 
-export {router as routes}
+export default routes

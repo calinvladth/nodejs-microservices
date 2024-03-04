@@ -16,5 +16,9 @@ export const config = {
     DB_HOST: process.env.DB_HOST,
     DB_USER:  process.env.DB_USER,
     DB_PASSWORD: readTextFromFile(process.env.DB_PASSWORD_FILE),
-    DB_DATABASE:  process.env.DB_DATABASE
+    DB_DATABASE:  process.env.DB_DATABASE,
+    MESSAGE_QUEUE_URL: process.env.MESSAGE_QUEUE_URL,
+    CHANNEL_NAME: 'MICRO',
+    CUSTOMER_SERVICE: 'CUSTOMER_SERVICE',
+    EMAIL_SERVICE: 'EMAIL_SERVICE'
 }
