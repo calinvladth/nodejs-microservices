@@ -8,6 +8,13 @@ services:
     depends_on:
       - customer
       - email
+
+  rabbitmq:
+    image: rabbitmq:alpine
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+
   customer:
     build:
       context: ./customer
@@ -20,9 +27,12 @@ services:
       DB_USER: postgres
       DB_PASSWORD_FILE: /run/secrets/db-password
       DB_DATABASE: auth
+      MESSAGE_QUEUE_URL: amqp://rabbitmq:5672
 #    ports:
 #      - 3001:3001
     depends_on:
+      rabbitmq:
+        condition: service_started
       db:
         condition: service_healthy
     secrets:
@@ -30,6 +40,7 @@ services:
       - jwt-secret
     volumes:
       - ./customer/src:/usr/src/app/src
+
   email:
     build:
       context: ./email
@@ -37,8 +48,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3002
-#    ports:
-#      - 3002:3002
+      MESSAGE_QUEUE_URL: amqp://rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_started
     volumes:
       - ./email/src:/usr/src/app/src
 
@@ -62,6 +75,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
 
 volumes:
   db-data:

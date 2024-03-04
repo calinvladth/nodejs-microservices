@@ -2,6 +2,7 @@ import express, {Express} from 'express'
 import {database} from  "./database";
 import {expressApp} from "./express-app";
 import {config} from "./config";
+import {events} from "./events";
 
 
 async function main() {

@@ -1,41 +1,51 @@
-import amqplib, {Channel} from "amqplib";
+import amqplib, {ConsumeMessage} from "amqplib";
 import {config} from "../config";
+import {EVENT_TYPES} from "./constants";
 
-async function createChannel() {
-    const connection = await amqplib.connect('amqp://rabbitmq:5672');
+async function createChannel({channelName}: {channelName: string}) {
+    const connection = await amqplib.connect(config.MESSAGE_QUEUE_URL as string);
     const channel = await connection.createChannel();
-    await channel.assertQueue(config.CHANNEL_NAME,{ durable: true })
+    await channel.assertQueue(channelName,{ durable: true })
     return channel
 }
 
-async function publishMessage({channel, service, message}: {channel: Channel, service: string, message: string}) {
-    channel.publish(config.CHANNEL_NAME, service, Buffer.from(message));
-    console.log("Sent: ", message);
-}
+async function listenMessages({channelName}: {channelName: string}) {
+    const channel = await createChannel({channelName})
 
-async function subscribeMessage({channel, service}: {channel: Channel, service: any}) {
-    await channel.assertExchange(config.CHANNEL_NAME, "direct", { durable: true });
-    const q = await channel.assertQueue("", { exclusive: true });
-    console.log(` Waiting for messages in queue: ${q.queue}`);
-
-    await channel.bindQueue(q.queue, config.CHANNEL_NAME, config.CUSTOMER_SERVICE);
-
-    await channel.consume(
-        q.queue,
-        (message) => {
-            if (message?.content) {
-                console.log("the message is:", message.content.toString());
-                service.SubscribeEvents(message.content.toString());
-            }
-            console.log("[X] received");
-        },
-        {
-            noAck: true,
+    await channel.consume(channelName, (message: ConsumeMessage | null) => {
+        if (message !== null) {
+            const parsedMessage: {eventType: string} = JSON.parse(message.content.toString())
+            handleEvents(parsedMessage)
+            channel.ack(message);
+        } else {
+            console.log('Consumer cancelled by server');
         }
-    );
-
+    });
 }
+
+function handleEvents(message: {eventType: string, [key: string]: unknown}) {
+    switch (message.eventType) {
+        case EVENT_TYPES.SIGNUP:
+            console.log('Handle email for signup ', message)
+            break
+
+        case EVENT_TYPES.SIGNIN:
+            console.log('Handle email for signin ', message)
+            break
+
+        case EVENT_TYPES.FORGOT:
+            console.log('Handle email for forgot')
+            break
+
+        case EVENT_TYPES.RESET:
+            console.log('Handle email for reset')
+            break
+    }
+}
+
+
 
 export const events = {
-    createChannel
+    listenMessages,
+    EVENT_TYPES
 }

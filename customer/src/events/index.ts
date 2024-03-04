@@ -1,41 +1,22 @@
 import amqplib, {Channel} from "amqplib";
 import {config} from "../config";
+import {EVENT_TYPES} from "./constants";
 
-async function createChannel() {
-    const connection = await amqplib.connect('amqp://rabbitmq:5672');
+async function createChannel({channelName}: {channelName: string}) {
+    const connection = await amqplib.connect(config.MESSAGE_QUEUE_URL as string);
     const channel = await connection.createChannel();
     await channel.assertQueue(config.CHANNEL_NAME,{ durable: true })
     return channel
 }
 
-async function publishMessage({channel, service, message}: {channel: Channel, service: string, message: string}) {
-    channel.publish(config.CHANNEL_NAME, service, Buffer.from(message));
+async function publishMessage({channelName, message}: {channelName: string, message: {eventType: string, [key: string]: unknown}}) {
+    const channel = await createChannel({channelName})
+
+    channel.sendToQueue(channelName, Buffer.from(JSON.stringify(message)));
     console.log("Sent: ", message);
 }
 
-async function subscribeMessage({channel, service}: {channel: Channel, service: unknown}) {
-    await channel.assertExchange(config.CHANNEL_NAME, "direct", { durable: true });
-    const q = await channel.assertQueue("", { exclusive: true });
-    console.log(` Waiting for messages in queue: ${q.queue}`);
-
-    await channel.bindQueue(q.queue, config.CHANNEL_NAME, config.CUSTOMER_SERVICE);
-
-    await channel.consume(
-        q.queue,
-        (message) => {
-            if (message?.content) {
-                console.log("the message is:", message.content.toString());
-                service.SubscribeEvents(message.content.toString());
-            }
-            console.log("[X] received");
-        },
-        {
-            noAck: true,
-        }
-    );
-
-}
-
 export const events = {
-    createChannel
+    publishMessage,
+    EVENT_TYPES
 }
