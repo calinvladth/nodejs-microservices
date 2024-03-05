@@ -18,7 +18,7 @@ export const config = {
     SMTP_HOST: process.env.SMTP_HOST,
     SMTP_SECURE: process.env.SMTP_SECURE === 'true',
     SMTP_USER: process.env.SMTP_USER,
-    SMTP_PASSWORD: readTextFromFile(process.env.SMTP_PASSWORD_FILE),
+    SMTP_PASSWORD: process.env.SMTP_PASSWORD,
     CHANNEL_NAME: 'MICRO',
     CUSTOMER_SERVICE: 'CUSTOMER_SERVICE',
     EMAIL_SERVICE: 'EMAIL_SERVICE'

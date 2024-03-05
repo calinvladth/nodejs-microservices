@@ -6,7 +6,7 @@ services:
     volumes:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-      - customer
+#      - customer
       - email
 
   rabbitmq:
@@ -25,14 +25,14 @@ services:
       context: ./customer
       target: dev
     environment:
-      NODE_ENV: production
-      PORT: 3001
-      JWT_SECRET_FILE: /run/secrets/jwt-secret
-      DB_HOST: db
-      DB_USER: postgres
-      DB_PASSWORD_FILE: /run/secrets/db-password
-      DB_DATABASE: auth
-      MESSAGE_QUEUE_URL: amqp://rabbitmq:5672
+      - NODE_ENV=production
+      - PORT=3001
+      - JWT_SECRET=$JWT_SECRET
+      - DB_HOST=db
+      - DB_USER=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+      - DB_DATABASE=$CUSTOMER_SERVICE_DB
+      - MESSAGE_QUEUE_URL=$MESSAGE_QUEUE_URL
 #    ports:
 #      - 3001:3001
     depends_on:
@@ -40,9 +40,6 @@ services:
         condition: service_healthy
       db:
         condition: service_healthy
-    secrets:
-      - db-password
-      - jwt-secret
     volumes:
       - ./customer/src:/usr/src/app/src
 
@@ -51,51 +48,40 @@ services:
       context: ./email
       target: dev
     environment:
-      NODE_ENV: production
-      PORT: 3002
-      MESSAGE_QUEUE_URL: amqp://rabbitmq:5672
-      SMTP_SERVICE: gmail
-      SMTP_PORT: 465
-      SMTP_HOST: smtp.gmail.com
-      SMTP_SECURE: true
-      SMTP_USER: calinvladth1@gmail.com
-      SMTP_PASSWORD_FILE: /run/secrets/smtp-password
+      - NODE_ENV=production
+      - PORT=3002
+      - MESSAGE_QUEUE_URL=$MESSAGE_QUEUE_URL
+      - SMTP_SERVICE=$SMTP_SERVICE
+      - SMTP_PORT=$SMTP_PORT
+      - SMTP_HOST=$SMTP_HOST
+      - SMTP_SECURE=$SMTP_SECURE
+      - SMTP_USER=$SMTP_USER
+      - SMTP_PASSWORD=$SMTP_PASSWORD
     depends_on:
       rabbitmq:
         condition: service_healthy
-    secrets:
-      - smtp-password
     volumes:
       - ./email/src:/usr/src/app/src
 
   db:
-    image: postgres
+    container_name: db
+    build:
+      context: ./database
     restart: always
-    user: postgres
-    secrets:
-      - db-password
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=auth
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     expose:
       - 5432
     ports:
       - 5433:5432
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
+      test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-
 volumes:
   db-data:
-secrets:
-  smtp-password:
-    file: secrets/smtp-password.txt
-  db-password:
-    file: secrets/db-password.txt
-  jwt-secret:
-    file: secrets/jwt-secret.txt

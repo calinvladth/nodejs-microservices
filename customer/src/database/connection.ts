@@ -16,7 +16,6 @@ const pool = new Pool({
 export async function dbConnect() {
     try {
         await pool.connect()
-        // pool.query('DROP TABLE IF EXISTS users;')
         await models.UsersModel()
         console.log('[database] Connected')
     } catch (err) {

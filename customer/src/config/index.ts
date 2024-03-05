@@ -12,10 +12,10 @@ function readTextFromFile(file: string | undefined) {
 
 export const config = {
     PORT: process.env.PORT,
-    JWT_SECRET: readTextFromFile(process.env.JWT_SECRET_FILE),
+    JWT_SECRET: process.env.JWT_SECRET,
     DB_HOST: process.env.DB_HOST,
     DB_USER:  process.env.DB_USER,
-    DB_PASSWORD: readTextFromFile(process.env.DB_PASSWORD_FILE),
+    DB_PASSWORD: process.env.DB_PASSWORD,
     DB_DATABASE:  process.env.DB_DATABASE,
     MESSAGE_QUEUE_URL: process.env.MESSAGE_QUEUE_URL,
     CHANNEL_NAME: 'MICRO',
