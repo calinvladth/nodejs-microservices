@@ -14,6 +14,11 @@ services:
     container_name: rabbitmq
     ports:
       - '5672:5672'
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
 
   customer:
     build:
@@ -32,7 +37,7 @@ services:
 #      - 3001:3001
     depends_on:
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
       db:
         condition: service_healthy
     secrets:
@@ -49,9 +54,17 @@ services:
       NODE_ENV: production
       PORT: 3002
       MESSAGE_QUEUE_URL: amqp://rabbitmq:5672
+      SMTP_SERVICE: gmail
+      SMTP_PORT: 465
+      SMTP_HOST: smtp.gmail.com
+      SMTP_SECURE: true
+      SMTP_USER: calinvladth1@gmail.com
+      SMTP_PASSWORD_FILE: /run/secrets/smtp-password
     depends_on:
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
+    secrets:
+      - smtp-password
     volumes:
       - ./email/src:/usr/src/app/src
 
@@ -80,6 +93,8 @@ services:
 volumes:
   db-data:
 secrets:
+  smtp-password:
+    file: secrets/smtp-password.txt
   db-password:
     file: secrets/db-password.txt
   jwt-secret:

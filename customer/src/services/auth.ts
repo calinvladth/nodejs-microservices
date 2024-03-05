@@ -16,7 +16,12 @@ async function signUp(req: Request, res: Response) {
     `, [username, email, await hashText(password)])
 
         const token = await generateToken(rows[0])
-        await events.publishMessage({channelName: config.CHANNEL_NAME, message: {eventType: events.EVENT_TYPES.SIGNUP, token}})
+
+        await events.publishMessage({
+            channelName: config.CHANNEL_NAME,
+            message: {eventType: events.EVENT_TYPES.SIGNUP, data: {email}}
+        })
+
         res.send({token})
     } catch (err) {
         res.send(err)
@@ -27,10 +32,16 @@ async function signIn(req: Request, res: Response) {
     try {
         const {email, username, password} = req.body
         const {rows} = await database.query('SELECT * FROM users WHERE email=$1 OR username=$2', [email, username])
+
         await checkTextHash(password, rows[0].password)
+
         const token = await generateToken(rows[0])
 
-        await events.publishMessage({channelName: config.CHANNEL_NAME, message: {eventType: events.EVENT_TYPES.SIGNIN, token}})
+        // TODO: Only for testing purposes
+        await events.publishMessage({
+            channelName: config.CHANNEL_NAME,
+            message: {eventType: events.EVENT_TYPES.SIGNIN, data: {email}}
+        })
 
         res.send(token)
     } catch (err) {
