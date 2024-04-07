@@ -1,4 +1,3 @@
-// TODO: Handle db from here
 import {Pool} from 'pg'
 import {models} from "../models";
 import {config} from "../config";

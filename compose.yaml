@@ -6,8 +6,9 @@ services:
     volumes:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-#      - customer
+      - customer
       - email
+      - maps
 
   rabbitmq:
     image: rabbitmq:alpine
@@ -62,6 +63,29 @@ services:
         condition: service_healthy
     volumes:
       - ./email/src:/usr/src/app/src
+
+  maps:
+    build:
+      context: ./maps
+      target: dev
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - JWT_SECRET=$JWT_SECRET
+      - DB_HOST=db
+      - DB_USER=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+      - DB_DATABASE=$MAPS_SERVICE_DB
+      - MESSAGE_QUEUE_URL=$MESSAGE_QUEUE_URL
+    #    ports:
+    #      - 3003:3003
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    volumes:
+      - ./maps/src:/usr/src/app/src
 
   db:
     container_name: db
