@@ -20,9 +20,14 @@ async function signUp(req: Request, res: Response) {
         //     message: {eventType: events.EVENT_TYPES.SIGNUP, data: {email}}
         // })
 
-        res.send({token})
-    } catch (err) {
-        res.send(err)
+        res.send({email, username, token})
+    } catch (err: unknown) {
+        // @ts-ignore
+        if (err.constraint) {
+            res.status(403).send('User already exists')
+        } else {
+            res.status(400).send('Bad request')
+        }
     }
 }
 
@@ -41,9 +46,9 @@ async function signIn(req: Request, res: Response) {
         //     message: {eventType: events.EVENT_TYPES.SIGNIN, data: {email}}
         // })
 
-        res.send(token)
+        res.send({email, username, token})
     } catch (err) {
-        res.send(err)
+        res.status(400).send('Bad request')
     }
 }
 
