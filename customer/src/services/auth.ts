@@ -53,7 +53,12 @@ async function signIn(req: Request, res: Response) {
 }
 
 async function checkProtection(req: Request, res: Response) {
-    res.send({user: res.locals.user})
+    try {
+        const {email, username, password} = res.locals.user
+        res.send({email, username, password})
+    } catch (err) {
+        res.status(401).send('Restricted access')
+    }
 }
 
 export const auth = {

@@ -1,20 +1,20 @@
 import {Express} from "express";
 import {services} from "./services";
-import {middleware} from "./middleware";
+import {middlewares} from "./middlewares";
 
 
 function routes(app: Express) {
-    app.get('/', [middleware.verifyTokenController], services.maps.get);
-    app.post('/', [middleware.verifyTokenController], services.maps.create);
-    app.get('/:mapId', services.maps.getById);
-    app.patch('/:mapId', [middleware.verifyTokenController], services.maps.update);
-    app.delete('/:mapId',[middleware.verifyTokenController], services.maps.remove);
-    app.get('/:mapId/categories', services.categories.get);
-    app.get('/:mapId/picks', services.picks.get);
-    app.post('/:mapId/picks', [middleware.verifyTokenController], services.picks.create);
-    app.get('/:mapId/picks/:pickId', services.picks.getById);
-    app.patch('/:mapId/picks/:pickId', [middleware.verifyTokenController], services.picks.update);
-    app.delete('/:mapId/picks/:pickId', [middleware.verifyTokenController], services.picks.remove);
+    app.get('/', [middlewares.verifyTokenController], services.maps.get);
+    app.post('/', [middlewares.verifyTokenController], services.maps.create);
+    app.get('/:map_id', [middlewares.verifyMapState],  services.maps.getById);
+    app.patch('/:map_id', [middlewares.verifyTokenController], services.maps.update);
+    app.delete('/:map_id',[middlewares.verifyTokenController], services.maps.remove);
+    app.get('/:map_id/categories', [middlewares.verifyMapState], services.categories.get);
+    app.get('/:map_id/picks', [middlewares.verifyMapState], services.picks.get);
+    app.post('/:map_id/picks', [middlewares.verifyTokenController], services.picks.create);
+    app.get('/:map_id/picks/:pickId', [middlewares.verifyMapState], services.picks.getById);
+    app.patch('/:map_id/picks/:pickId', [middlewares.verifyTokenController], services.picks.update);
+    app.delete('/:map_id/picks/:pickId', [middlewares.verifyTokenController], services.picks.remove);
 }
 
 

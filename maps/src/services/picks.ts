@@ -3,7 +3,7 @@ import {models} from "../models";
 
 async function get(req: Request, res: Response) {
     try {
-        const picks = await models.picksQueries.getPicks(req.params.mapId)
+        const picks = await models.picksQueries.getPicks(req.params.map_id)
         res.send(picks)
     } catch (err) {
         res.send(err)
@@ -12,7 +12,7 @@ async function get(req: Request, res: Response) {
 
 async function getById(req: Request, res: Response) {
     try {
-        const picks = await models.picksQueries.getPickById({mapId: req.params.mapId, pickId: req.params.pickId})
+        const picks = await models.picksQueries.getPickById({map_id: req.params.map_id, pickId: req.params.pickId})
         res.send(picks)
     } catch (err) {
         res.send(err)
@@ -22,7 +22,7 @@ async function getById(req: Request, res: Response) {
 
 async function create(req: Request, res: Response) {
     try {
-        const pick = await models.picksQueries.createPick({...req.body, mapId: req.params.mapId})
+        const pick = await models.picksQueries.createPick({pick: {...req.body, map_id: req.params.map_id}, user_id: res.locals.user.id})
         res.send(pick)
     } catch (err) {
         res.send(err)
@@ -31,7 +31,7 @@ async function create(req: Request, res: Response) {
 
 async function update(req: Request, res: Response) {
     try {
-        const pick = models.picksQueries.editPick({...req.body, id: req.params.pickId, mapId: req.params.mapId})
+        const pick = models.picksQueries.editPick({...req.body, id: req.params.pickId, map_id: req.params.map_id})
         res.send(pick)
     } catch (err) {
         res.send(err)

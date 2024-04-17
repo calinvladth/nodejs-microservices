@@ -13,7 +13,8 @@ function routes(app: Express) {
     app.post('/auth/signup', services.auth.signUp)
     app.post('/auth/signin', services.auth.signIn)
 
-    app.get('/protected', [middleware.verifyTokenController], services.auth.checkProtection)
+    // app.get('/protected', [middleware.verifyTokenController], services.auth.checkProtection)
+    app.get('/check', [middleware.verifyTokenController], services.auth.checkProtection)
 }
 
 

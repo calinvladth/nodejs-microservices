@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from 'express'
-import {verifyToken} from "./utils/jwt";
+import {verifyToken} from "../utils/jwt";
 
 export async function verifyTokenController (req: Request, res: Response, next: NextFunction) {
     try {

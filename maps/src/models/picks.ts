@@ -7,7 +7,8 @@ export interface PicksInterface {
     lat: number,
     lng: number,
     text: string
-    mapId: string
+    map_id: string,
+    user_id: string
 }
 
 export async function Picks() {
@@ -17,35 +18,36 @@ export async function Picks() {
             category VARCHAR(255),
             lat DOUBLE PRECISION,
             lng DOUBLE PRECISION,
-            text TEXT,
-            mapId SERIAL REFERENCES maps(id) ON DELETE CASCADE
+            text TEXT, 
+            map_id SERIAL REFERENCES maps(id) ON DELETE CASCADE,
+            user_id SERIAL NOT NULL
         )`);
 }
 
-export async function getPicks(mapId: string) {
+export async function getPicks(map_id: string) {
     const {rows} = await database.query(`
             SELECT * FROM picks 
-            WHERE mapId = '${mapId}';
+            WHERE map_id = '${map_id}';
         `)
 
     return rows
 }
 
-export async function getPickById({mapId, pickId}: {mapId: string, pickId: string}) {
+export async function getPickById({map_id, pickId}: {map_id: string, pickId: string}) {
     const {rows} = await database.query(`
             SELECT * FROM picks 
-            WHERE mapId = '${mapId}' AND id = '${pickId}';
+            WHERE map_id = '${map_id}' AND id = '${pickId}';
         `)
 
     return rows[0]
 }
 
 
-export async function getCategories(mapId: string) {
+export async function getCategories(map_id: string) {
     const {rows} = await database.query(`
             SELECT DISTINCT category
             FROM picks
-            WHERE mapId = ${mapId};
+            WHERE map_id = ${map_id};
         `)
 
     return rows
@@ -60,11 +62,11 @@ export async function getPicksByCategory(category: string) {
     return rows
 }
 
-async function createPick(pick: PicksInterface) {
-    const {category, name, lat, lng, text, mapId} = pick
+async function createPick({pick, user_id}: {pick: PicksInterface, user_id: string}) {
+    const {category, name, lat, lng, text, map_id} = pick
     const {rows} = await database.query(`
-            INSERT INTO picks (category, name, lat, lng, text, mapId)
-            VALUES ('${category}', '${name}', ${lat}, ${lng}, '${text}', '${mapId}')
+            INSERT INTO picks (category, name, lat, lng, text, map_id, user_id)
+            VALUES ('${category}', '${name}', ${lat}, ${lng}, '${text}', '${map_id}', '${user_id}')
             RETURNING *;
         `)
 
@@ -72,7 +74,7 @@ async function createPick(pick: PicksInterface) {
 }
 
 async function editPick(pick: PicksInterface) {
-    const {id, category, name, lat, lng, text, mapId} = pick
+    const {id, category, name, lat, lng, text, map_id} = pick
     const {rows} = await database.query(`
             UPDATE picks SET
             category = '${category}',
@@ -81,7 +83,7 @@ async function editPick(pick: PicksInterface) {
             lng = '${lng}',
             text = '${text}'
             WHERE id = ${id} 
-            AND mapId = ${mapId}
+            AND map_id = ${map_id}
             RETURNING *;
         `)
 

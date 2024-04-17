@@ -5,8 +5,8 @@ export interface MapsInterface {
     name: string,
     lat: number,
     lng: number,
-    userId: string,
-    startingPosition: string
+    user_id: string,
+    is_public: boolean
 }
 
 export async function Maps() {
@@ -15,33 +15,34 @@ export async function Maps() {
             name VARCHAR(255),
             lat DOUBLE PRECISION,
             lng DOUBLE PRECISION,
-            userId TEXT NOT NULL
+            is_public BOOLEAN DEFAULT FALSE,
+            user_id SERIAL NOT NULL
         )`);
 }
 
-async function getMaps(userId: string) {
+async function getMaps(user_id: string) {
     const {rows} = await database.query(`
             SELECT * FROM maps
-            WHERE userId = '${userId}'
+            WHERE user_id = '${user_id}' 
         `)
 
     return rows
 }
 
-async function getMapById(mapId: string) {
+async function getMapById(map_id: string) {
     const {rows} = await database.query(`
             SELECT * FROM maps
-            WHERE id = ${mapId}
+            WHERE id = ${map_id}
         `)
 
     return rows[0]
 }
 
-async function createMap({map, userId}: { map: MapsInterface, userId: string }) {
+async function createMap({map, user_id}: { map: MapsInterface, user_id: string }) {
     const {rows} = await database.query(`
-            INSERT INTO maps (name, lat, lng, userId)
+            INSERT INTO maps (name, lat, lng, user_id)
             VALUES
-            ('${map.name}', ${map.lat}, ${map.lng}, '${userId}')
+            ('${map.name}', ${map.lat}, ${map.lng}, '${user_id}')
             RETURNING *
         `)
 
@@ -53,7 +54,8 @@ async function editMap(map: MapsInterface) {
             UPDATE maps SET
             name = '${map.name}',
             lat = '${map.lat}',
-            lng = '${map.lng}'
+            lng = '${map.lng}',
+            is_public = ${map.is_public}
             WHERE id = ${map.id}
             RETURNING *
         `)
@@ -61,9 +63,9 @@ async function editMap(map: MapsInterface) {
     return rows
 }
 
-async function removeMap(mapId: string) {
+async function removeMap(map_id: string) {
     const {rows} = await database.query(`
-            DELETE FROM maps WHERE id = ${mapId} 
+            DELETE FROM maps WHERE id = ${map_id} 
             RETURNING *
         `)
 
