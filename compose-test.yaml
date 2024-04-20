@@ -1,4 +1,8 @@
 services:
+#  ui-pick-on-maps:
+#    image: ghcr.io/calinvladth/ui_pick_on_maps:latest
+#    environment:
+#      - VITE_API_URL=$API_URL
   ui-pick-on-maps:
     container_name: ui-pick-on-maps
     build:

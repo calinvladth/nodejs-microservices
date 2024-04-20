@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css'
 import {Route, Routes} from "react-router-dom";
-import {API, PATHS} from "./utils/constants";
+import {URL, API, PATHS} from "./utils/constants";
 import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectUser, userActions} from "./slices/userSlice";
