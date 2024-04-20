@@ -19,12 +19,12 @@ jobs:
         run:
           docker build customer -t ghcr.io/${{secrets.DOCKER_USERNAME}}/customer_service:latest
           docker build email -t ghcr.io/${{secrets.DOCKER_USERNAME}}/email_service:latest
-#          docker build maps -t ghcr.io/${{secrets.DOCKER_USERNAME}}/maps_service:latest
-#          docker build ui-pick-on-maps -t ghcr.io/${{secrets.DOCKER_USERNAME}}/ui_pick_on_maps:latest
+          docker build maps -t ghcr.io/${{secrets.DOCKER_USERNAME}}/maps_service:latest
+          docker build ui-pick-on-maps -t ghcr.io/${{secrets.DOCKER_USERNAME}}/ui_pick_on_maps:latest
 
       - name: Publish images
         run:
           docker push ghcr.io/${{secrets.DOCKER_USERNAME}}/customer_service:latest
           docker push ghcr.io/${{secrets.DOCKER_USERNAME}}/email_service:latest
-#          docker push ghcr.io/${{secrets.DOCKER_USERNAME}}/maps_service:latest
-#          docker push ghcr.io/${{secrets.DOCKER_USERNAME}}/ui-pick-on-maps:latest
+          docker push ghcr.io/${{secrets.DOCKER_USERNAME}}/maps_service:latest
+          docker push ghcr.io/${{secrets.DOCKER_USERNAME}}/ui-pick-on-maps:latest
