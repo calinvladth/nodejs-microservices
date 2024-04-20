@@ -20,6 +20,13 @@ services:
       timeout: 30s
       retries: 3
 
+  ui-pick-on-maps:
+    image: ghcr.io/calinvladth/ui_pick_on_maps:latest
+    depends_on:
+      - customer
+      - email
+      - maps
+
   customer:
     image: ghcr.io/calinvladth/customer_service:latest
     environment:
@@ -51,6 +58,14 @@ services:
       - SMTP_PASSWORD=$SMTP_PASSWORD
     depends_on:
       rabbitmq:
+        condition: service_healthy
+
+  maps:
+    image: ghcr.io/calinvladth/maps_service:latest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
         condition: service_healthy
 
   db:
