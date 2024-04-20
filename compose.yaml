@@ -15,7 +15,7 @@ services:
     container_name: ui-pick-on-maps
     build:
       context: ./ui/pick-on-maps
-      target: dev
+      target: prod
     environment:
       - VITE_API_URL=$API_URL
     ports:
