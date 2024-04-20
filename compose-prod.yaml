@@ -22,6 +22,8 @@ services:
 
   ui-pick-on-maps:
     image: ghcr.io/calinvladth/ui_pick_on_maps:latest
+    environment:
+      - VITE_API_URL=$API_URL
     depends_on:
       - customer
       - email
@@ -62,6 +64,15 @@ services:
 
   maps:
     image: ghcr.io/calinvladth/maps_service:latest
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - JWT_SECRET=$JWT_SECRET
+      - DB_HOST=db
+      - DB_USER=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+      - DB_DATABASE=$MAPS_SERVICE_DB
+      - MESSAGE_QUEUE_URL=$MESSAGE_QUEUE_URL
     depends_on:
       rabbitmq:
         condition: service_healthy

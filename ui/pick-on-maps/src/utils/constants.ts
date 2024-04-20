@@ -1,7 +1,6 @@
 // TODO: Add env variables
-export const API = 'http://localhost:3000/api'
-export const URL = 'http://localhost:3000'
-export const BASE_PATH = '/'
+export const URL = import.meta.env.VITE_API_URL
+export const API = `${import.meta.env.VITE_API_URL}/api`
 
 export const DEFAULT_ZOOM = 15
 
