@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css'
 import {Route, Routes} from "react-router-dom";
-import {PATHS} from "./utils/constants";
+import {API, PATHS} from "./utils/constants";
 import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectUser, userActions} from "./slices/userSlice";
@@ -15,6 +15,7 @@ function App() {
     const dispatch = useDispatch()
 
     useEffect(() => {
+        console.log("WTF?! ", import.meta.env, API, URL)
         if (isAuthenticated) {
             dispatch(userActions.checkUser())
         }
