@@ -1,5 +1,5 @@
 // TODO: Add env variables
-export const URL = import.meta.env.MODE === 'production' ? 'http://13.60.17.19:3000' : import.meta.env.VITE_API_URL
+export const URL = import.meta.env.MODE === 'production' ? 'http://pick-on-maps.aforc.ro' : import.meta.env.VITE_API_URL
 export const API = `${URL}/api`
 
 export const DEFAULT_ZOOM = 15

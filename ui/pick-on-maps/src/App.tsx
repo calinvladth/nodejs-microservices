@@ -15,7 +15,6 @@ function App() {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        console.log('WTF?!: ', import.meta.env)
         if (isAuthenticated) {
             dispatch(userActions.checkUser())
         }
