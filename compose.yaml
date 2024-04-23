@@ -17,7 +17,7 @@ services:
       context: ./ui/pick-on-maps
       target: prod
     environment:
-      - VITE_API_URL=$API_URL
+      - VITE_API_URL=${API_URL}
     ports:
       - '8080:8080'
     volumes:

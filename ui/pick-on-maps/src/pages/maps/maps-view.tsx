@@ -3,12 +3,13 @@ import {useDispatch, useSelector} from "react-redux";
 import {mapsActions, MapState, selectMaps} from "../../slices/mapsSlice";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Modal, Popconfirm} from "antd";
-import {DeleteOutlined, EditOutlined, ShareAltOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, ShareAltOutlined, SmileOutlined} from "@ant-design/icons";
 import {URL, COLORS, ICON_SIZE, PATHS} from "../../utils/constants";
-import {onGeneralReset} from "../../slices/generalSlice";
+import {onCurrentLocation, onGeneralReset} from "../../slices/generalSlice";
 import replaceKeysInUrl from "../../utils/replace-keys-in-url";
 import {CopyBlock} from "react-code-blocks";
 import generateIframe from "../../utils/generateIframe";
+import {useMap} from "react-leaflet";
 
 function MapsView() {
     const dispatch = useDispatch()

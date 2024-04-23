@@ -23,7 +23,6 @@ function Map() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <CurrentLocation/>
         <MarkersOnMap/>
 
         <MapActions.Search />
@@ -31,6 +30,7 @@ function Map() {
         <MapActions.WatchPosition/>
         <MapActions.WatchZoom/>
         <MapActions.MarkerDrag/>
+        <MapActions.LocateControl position="topleft"/>
     </MapContainer>
 }
 
