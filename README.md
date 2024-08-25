@@ -1,1 +1,1 @@
-Multiple microservices communicationg through events
+Multiple microservices communicating through events
