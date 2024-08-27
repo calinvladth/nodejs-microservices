@@ -6,8 +6,27 @@ services:
     volumes:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-#      - customer
+      - customer
       - email
+      - maps
+      - ui-pick-on-maps
+
+  ui-pick-on-maps:
+    container_name: ui-pick-on-maps
+    build:
+      context: ./ui/pick-on-maps
+      target: prod
+    environment:
+      - VITE_API_URL=${API_URL}
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./ui/pick-on-maps/src:/usr/src/app/src
+      - /usr/src/app/src/node_modules
+    depends_on:
+      - customer
+      - email
+      - maps
 
   rabbitmq:
     image: rabbitmq:alpine
@@ -62,6 +81,29 @@ services:
         condition: service_healthy
     volumes:
       - ./email/src:/usr/src/app/src
+
+  maps:
+    build:
+      context: ./maps
+      target: dev
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - JWT_SECRET=$JWT_SECRET
+      - DB_HOST=db
+      - DB_USER=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+      - DB_DATABASE=$MAPS_SERVICE_DB
+      - MESSAGE_QUEUE_URL=$MESSAGE_QUEUE_URL
+    #    ports:
+    #      - 3003:3003
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    volumes:
+      - ./maps/src:/usr/src/app/src
 
   db:
     container_name: db

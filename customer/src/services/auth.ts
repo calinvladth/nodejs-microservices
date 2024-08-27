@@ -2,8 +2,6 @@ import {Request, Response} from 'express'
 import {generateToken} from "../utils/jwt";
 import {checkTextHash, hashText} from "../utils/hash-password";
 import {database} from "../database";
-import {events} from "../events";
-import {config} from "../config";
 
 async function signUp(req: Request, res: Response) {
     try {
@@ -17,14 +15,19 @@ async function signUp(req: Request, res: Response) {
 
         const token = await generateToken(rows[0])
 
-        await events.publishMessage({
-            channelName: config.CHANNEL_NAME,
-            message: {eventType: events.EVENT_TYPES.SIGNUP, data: {email}}
-        })
+        // await events.publishMessage({
+        //     channelName: config.CHANNEL_NAME,
+        //     message: {eventType: events.EVENT_TYPES.SIGNUP, data: {email}}
+        // })
 
-        res.send({token})
-    } catch (err) {
-        res.send(err)
+        res.send({email, username, token})
+    } catch (err: unknown) {
+        // @ts-ignore
+        if (err.constraint) {
+            res.status(403).send('User already exists')
+        } else {
+            res.status(400).send('Bad request')
+        }
     }
 }
 
@@ -38,19 +41,24 @@ async function signIn(req: Request, res: Response) {
         const token = await generateToken(rows[0])
 
         // TODO: Only for testing purposes
-        await events.publishMessage({
-            channelName: config.CHANNEL_NAME,
-            message: {eventType: events.EVENT_TYPES.SIGNIN, data: {email}}
-        })
+        // await events.publishMessage({
+        //     channelName: config.CHANNEL_NAME,
+        //     message: {eventType: events.EVENT_TYPES.SIGNIN, data: {email}}
+        // })
 
-        res.send(token)
+        res.send({email, username, token})
     } catch (err) {
-        res.send(err)
+        res.status(400).send('Bad request')
     }
 }
 
 async function checkProtection(req: Request, res: Response) {
-    res.send({user: res.locals.user})
+    try {
+        const {email, username, password} = res.locals.user
+        res.send({email, username, password})
+    } catch (err) {
+        res.status(401).send('Restricted access')
+    }
 }
 
 export const auth = {
